@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acceso Socios | De la Fonte & La Locanda</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#faf9f5;color:#1b1c1a;min-height:100vh;}
+a{color:inherit;text-decoration:none;}
+.serif{font-family:'Playfair Display',serif;}
+.label-caps{font-size:11px;letter-spacing:0.15em;font-weight:500;color:#737973;text-transform:uppercase;}
+input[type=text],input[type=password]{
+  width:100%;border:none;border-bottom:1px solid #c3c8c1;
+  background:transparent;padding:10px 0;font-family:'DM Sans',sans-serif;
+  font-size:16px;color:#1b1c1a;outline:none;transition:border-color 0.2s;
+  border-radius:0;-webkit-appearance:none;
+}
+input:focus{border-bottom-color:#061b0e;}
+.btn-primary{
+  background:#061b0e;color:#fff;border:none;
+  padding:14px 32px;font-family:'DM Sans',sans-serif;
+  font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+  cursor:pointer;width:100%;transition:background 0.2s;
+}
+.btn-primary:hover{background:#1b3022;}
+.btn-primary:disabled{background:#c3c8c1;cursor:default;}
+.btn-ghost{
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;
+  text-transform:uppercase;border:1px solid rgba(195,200,193,0.6);
+  background:none;padding:7px 16px;cursor:pointer;color:#737973;transition:all 0.2s;
+}
+.btn-ghost:hover{border-color:#061b0e;color:#061b0e;}
+.divider{border:none;border-top:1px solid rgba(195,200,193,0.35);margin:24px 0;}
+/* Nav */
+.nav{
+  position:fixed;top:0;left:0;width:100%;z-index:900;
+  background:rgba(250,249,245,0.94);backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(195,200,193,0.2);
+}
+.nav-inner{
+  max-width:960px;height:68px;margin:0 auto;padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+/* Tabs */
+.tab-bar{border-bottom:1px solid rgba(195,200,193,0.35);display:flex;gap:0;}
+.tab-btn{
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.13em;
+  text-transform:uppercase;border:none;background:none;
+  padding:14px 22px;cursor:pointer;color:#737973;
+  border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;
+}
+.tab-btn.active{color:#061b0e;border-bottom-color:#061b0e;}
+.tab-btn:hover{color:#1b3022;}
+/* Cards */
+.card{background:#fff;border:1px solid rgba(195,200,193,0.35);padding:28px;}
+.card+.card{margin-top:16px;}
+.event-card{background:#fff;border:1px solid rgba(195,200,193,0.35);padding:24px;margin-bottom:16px;}
+.event-card:last-child{margin-bottom:0;}
+.price-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 0;border-bottom:1px solid rgba(195,200,193,0.2);
+}
+.price-row:last-child{border-bottom:none;}
+.badge-prop{
+  font-size:10px;letter-spacing:0.13em;font-weight:500;
+  text-transform:uppercase;display:inline-block;padding:3px 10px;
+  border:1px solid rgba(195,200,193,0.5);color:#737973;
+}
+.badge-comision{
+  font-size:10px;letter-spacing:0.1em;font-weight:500;
+  text-transform:uppercase;padding:4px 12px;
+  background:#d0e9d4;color:#061b0e;display:inline-block;
+}
+.info-box{
+  padding:16px 20px;border-left:2px solid #061b0e;
+  background:#f4f4f0;font-size:13px;color:#434843;line-height:1.75;
+}
+.nota-box{
+  padding:14px 18px;border:1px solid rgba(195,200,193,0.35);
+  background:#f4f4f0;font-size:12px;color:#737973;line-height:1.7;
+}
+/* Prop switcher */
+.prop-tab{
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;
+  text-transform:uppercase;border:1px solid rgba(195,200,193,0.5);
+  background:none;padding:8px 18px;cursor:pointer;color:#737973;transition:all 0.2s;
+}
+.prop-tab.active{background:#061b0e;color:#fff;border-color:#061b0e;}
+/* Error */
+.error-msg{font-size:13px;color:#ba1a1a;margin-top:10px;display:none;}
+/* Responsive */
+@media(max-width:600px){
+  .nav-inner{padding:0 20px;}
+  .portal-content{padding:24px 20px;}
+  .tab-btn{padding:12px 14px;font-size:10px;}
+  .prop-tab{padding:7px 12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span class="serif" style="font-size:17px;color:#061b0e;" id="nav-brand">Portal de Socios</span>
+    </div>
+    <div id="nav-acciones" style="display:none;align-items:center;gap:14px;">
+      <span class="label-caps" id="nav-empresa"></span>
+      <button class="btn-ghost" onclick="cerrarSesion()">Salir</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     PANTALLA LOGIN
+     ============================================================ -->
+<div id="pantalla-login" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;padding-top:100px;">
+  <div style="width:100%;max-width:380px;">
+
+    <div style="text-align:center;margin-bottom:44px;">
+      <div class="label-caps" style="margin-bottom:14px;">Acceso restringido</div>
+      <div class="serif" style="font-size:36px;color:#061b0e;line-height:1.15;">De la Fonte<br><span style="font-style:italic;font-size:28px;color:#4d6453;">&amp; La Locanda</span></div>
+      <p style="font-size:13px;color:#737973;margin-top:12px;line-height:1.6;">Portal exclusivo para agencias de turismo,<br>remises y operadoras.</p>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div class="label-caps" style="margin-bottom:10px;">Usuario</div>
+      <input type="text" id="inp-usuario" placeholder="usuario asignado" autocomplete="username">
+    </div>
+
+    <div style="margin-bottom:6px;">
+      <div class="label-caps" style="margin-bottom:10px;">Contraseña</div>
+      <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <div class="error-msg" id="error-login">Usuario o contraseña incorrectos.</div>
+
+    <div style="margin-top:28px;">
+      <button class="btn-primary" id="btn-ingresar" onclick="iniciarSesion()">Ingresar</button>
+    </div>
+
+    <div style="text-align:center;margin-top:22px;">
+      <span style="font-size:12px;color:#737973;">¿Todavía no tenés acceso? </span>
+      <button onclick="mostrarSolicitud()" style="font-family:'DM Sans',sans-serif;font-size:12px;color:#061b0e;background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0;">Solicitá ser socio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANTALLA SOLICITUD
+     ============================================================ -->
+<div id="pantalla-solicitud" style="display:none;min-height:100vh;align-items:center;justify-content:center;padding:40px 20px;padding-top:100px;">
+  <div style="width:100%;max-width:380px;">
+
+    <div style="margin-bottom:32px;">
+      <button onclick="volverLogin()" style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;background:none;border:none;cursor:pointer;color:#737973;display:flex;align-items:center;gap:6px;padding:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        Volver
+      </button>
+    </div>
+
+    <div style="margin-bottom:36px;">
+      <div class="label-caps" style="margin-bottom:12px;">Solicitud de acceso</div>
+      <div class="serif" style="font-size:26px;color:#061b0e;line-height:1.2;">Quiero ser socio</div>
+      <p style="font-size:13px;color:#737973;margin-top:10px;line-height:1.6;">Completá tus datos y te contactamos para darte acceso al portal.</p>
+    </div>
+
+    <div style="margin-bottom:22px;">
+      <div class="label-caps" style="margin-bottom:10px;">Empresa / Nombre</div>
+      <input type="text" id="sol-empresa" placeholder="Agencia, remis o tour operadora">
+    </div>
+    <div style="margin-bottom:22px;">
+      <div class="label-caps" style="margin-bottom:10px;">Teléfono / WhatsApp</div>
+      <input type="text" id="sol-telefono" placeholder="+54 9 ...">
+    </div>
+    <div style="margin-bottom:22px;">
+      <div class="label-caps" style="margin-bottom:10px;">Email</div>
+      <input type="text" id="sol-email" placeholder="contacto@empresa.com">
+    </div>
+    <div style="margin-bottom:6px;">
+      <div class="label-caps" style="margin-bottom:10px;">Tipo de empresa</div>
+      <select id="sol-tipo" style="width:100%;border:none;border-bottom:1px solid #c3c8c1;background:transparent;padding:10px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#1b1c1a;outline:none;-webkit-appearance:none;border-radius:0;">
+        <option value="">Seleccioná...</option>
+        <option value="Agencia de turismo">Agencia de turismo</option>
+        <option value="Remis / Transfer">Remis / Transfer</option>
+        <option value="Tour operadora">Tour operadora</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+
+    <div class="error-msg" id="error-solicitud">Completá todos los campos.</div>
+    <div id="exito-solicitud" style="display:none;font-size:13px;color:#2d6a3f;margin-top:10px;line-height:1.6;">
+      ✓ Solicitud enviada. Te contactamos en menos de 24 hs.
+    </div>
+
+    <div style="margin-top:28px;">
+      <button class="btn-primary" id="btn-solicitar" onclick="enviarSolicitud()">Enviar solicitud</button>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:#737973;margin-top:18px;line-height:1.6;">
+      Tu información no será compartida con terceros.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANTALLA PORTAL
+     ============================================================ -->
+<div id="pantalla-portal" style="display:none;padding-top:68px;">
+
+  <!-- Bienvenida -->
+  <div style="background:#fff;border-bottom:1px solid rgba(195,200,193,0.35);padding:28px 32px;">
+    <div style="max-width:960px;margin:0 auto;">
+      <div class="label-caps" style="margin-bottom:8px;">Bienvenido</div>
+      <div class="serif" style="font-size:26px;color:#061b0e;" id="portal-titulo">Hola</div>
+      <p style="font-size:13px;color:#737973;margin-top:6px;">
+        Esta información es confidencial y exclusiva para socios comerciales.
+      </p>
+
+      <!-- Selector de propiedad (visible solo si tiene ambas) -->
+      <div id="prop-switcher" style="margin-top:18px;gap:8px;flex-wrap:wrap;display:none;">
+        <button class="prop-tab active" onclick="cambiarPropiedad('restaurant',this)">Restaurant</button>
+        <button class="prop-tab" onclick="cambiarPropiedad('hotel',this)">Hotel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs de contenido -->
+  <div style="max-width:960px;margin:0 auto;">
+    <div class="tab-bar" style="padding:0 32px;" id="barra-tabs">
+      <button class="tab-btn active" onclick="cambiarTab('eventos',this)">Eventos &amp; Grupos</button>
+      <button class="tab-btn" onclick="cambiarTab('comisiones',this)">Comisiones</button>
+      <button class="tab-btn" onclick="cambiarTab('contacto',this)">Contacto</button>
+    </div>
+  </div>
+
+  <!-- Contenido tabs -->
+  <div class="portal-content" style="max-width:960px;margin:0 auto;padding:32px 32px 60px;">
+
+
+    <!-- ===== TAB EVENTOS ===== -->
+    <div id="tab-eventos">
+      <div id="eventos-restaurant">
+        <div class="label-caps" style="margin-bottom:24px;">Propuestas · De la Fonte Restaurant &amp; Wine Bar</div>
+        <div id="eventos-restaurant-lista"></div>
+        <div class="nota-box" style="margin-top:20px;">
+          Precios orientativos, actualizados mensualmente. Siempre confirmar disponibilidad antes de ofrecer al pasajero.
+        </div>
+      </div>
+
+      <div id="eventos-hotel" style="display:none;">
+        <div class="label-caps" style="margin-bottom:24px;">Propuestas · La Locanda – Art &amp; Taste Retreat</div>
+        <div id="eventos-hotel-lista"></div>
+        <div class="nota-box" style="margin-top:20px;">
+          Disponibilidad sujeta a temporada. Para propuestas de grupos en el hotel, coordinar con al menos 7 días de anticipación.
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB COMISIONES ===== -->
+    <div id="tab-comisiones" style="display:none;">
+      <div id="comisiones-restaurant">
+        <div class="label-caps" style="margin-bottom:24px;">Comisiones · De la Fonte Restaurant &amp; Wine Bar</div>
+        <div class="card" style="margin-bottom:24px;">
+          <div class="serif" style="font-size:19px;color:#061b0e;margin-bottom:12px;">¿Cómo funciona?</div>
+          <p style="font-size:14px;color:#434843;line-height:1.8;">
+            Cada vez que un pasajero a tu cargo reserva y consume en De la Fonte mencionando tu agencia o código de socio, registramos la venta y te liquidamos la comisión al cierre del mes.
+          </p>
+        </div>
+        <div id="comisiones-restaurant-lista" style="margin-bottom:8px;"></div>
+        <div class="info-box" style="margin-top:16px;">
+          Liquidación entre el 1 y el 5 de cada mes por transferencia bancaria. Monto mínimo de liquidación: $5.000 ARS. Montos menores se acumulan al mes siguiente.
+        </div>
+      </div>
+
+      <div id="comisiones-hotel" style="display:none;">
+        <div class="label-caps" style="margin-bottom:24px;">Comisiones · La Locanda – Art &amp; Taste Retreat</div>
+        <div class="card" style="margin-bottom:24px;">
+          <div class="serif" style="font-size:19px;color:#061b0e;margin-bottom:12px;">¿Cómo funciona?</div>
+          <p style="font-size:14px;color:#434843;line-height:1.8;">
+            Al derivar pasajeros al hotel, registramos la reserva a tu nombre. La comisión se calcula sobre el total de la estadía y se liquida al checkout del huésped.
+          </p>
+        </div>
+        <div id="comisiones-hotel-lista" style="margin-bottom:8px;"></div>
+        <div class="info-box" style="margin-top:16px;">
+          Liquidación al checkout del huésped, dentro de los 5 días hábiles. El porcentaje se calcula sobre el total neto de la estadía, sin incluir extras.
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ===== TAB CONTACTO ===== -->
+    <div id="tab-contacto" style="display:none;">
+      <div class="label-caps" style="margin-bottom:24px;">Contacto directo</div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+          <div style="width:44px;height:44px;border-radius:50%;background:#d0e9d4;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:#061b0e;flex-shrink:0;">DLF</div>
+          <div style="flex:1;min-width:200px;">
+            <div style="font-weight:500;font-size:15px;color:#1b1c1a;">Coordinación de Grupos – Restaurant</div>
+            <div style="font-size:13px;color:#737973;margin-top:2px;">De la Fonte · Restaurant &amp; Wine Bar</div>
+            <hr class="divider">
+            <table style="font-size:13px;width:100%;border-collapse:collapse;">
+              <tr><td style="color:#737973;padding:5px 0;width:110px;">WhatsApp</td><td style="color:#061b0e;font-weight:500;">+54 9 3757 ···-····</td></tr>
+              <tr><td style="color:#737973;padding:5px 0;">Email</td><td style="color:#061b0e;font-weight:500;">grupos@delafonteresto.com</td></tr>
+              <tr><td style="color:#737973;padding:5px 0;">Horario</td><td style="color:#1b1c1a;">Lun–Vie 10:00 a 18:00</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+          <div style="width:44px;height:44px;border-radius:50%;background:#e1e6c2;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:#161905;flex-shrink:0;">LL</div>
+          <div style="flex:1;min-width:200px;">
+            <div style="font-weight:500;font-size:15px;color:#1b1c1a;">Reservas – Hotel</div>
+            <div style="font-size:13px;color:#737973;margin-top:2px;">La Locanda – Art &amp; Taste Retreat</div>
+            <hr class="divider">
+            <table style="font-size:13px;width:100%;border-collapse:collapse;">
+              <tr><td style="color:#737973;padding:5px 0;width:110px;">WhatsApp</td><td style="color:#061b0e;font-weight:500;">+54 9 3757 ···-····</td></tr>
+              <tr><td style="color:#737973;padding:5px 0;">Email</td><td style="color:#061b0e;font-weight:500;">reservas@lalocanda.com.ar</td></tr>
+              <tr><td style="color:#737973;padding:5px 0;">Horario</td><td style="color:#1b1c1a;">Todos los días 9:00 a 20:00</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        Para reservas de grupos envianos fecha, cantidad de personas y tipo de evento por WhatsApp. Confirmamos disponibilidad en menos de 2 horas en horario hábil. Para eventos con más de 20 personas, requerimos un mínimo de 72 hs de anticipación.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPT
+     ============================================================ -->
+<script>
+/* ---------------------------------------------------------------
+   CONEXIÓN A GOOGLE SHEETS (Apps Script)
+--------------------------------------------------------------- */
+var API_URL = "https://script.google.com/macros/s/AKfycbzn2R99C3k2s1wNScjE7X5Z7rQyeE_yXlNriV3o8KQz_d0hRahyFOJzX5JqvbkyuJb1GQ/exec";
+
+var DATA = { usuarios: [], eventos: [], comisiones: [] };
+var sesion = null;
+var propActual = "restaurant";
+
+/* Carga los datos de la planilla al abrir la página */
+function cargarDatos() {
+  var btn = document.getElementById('btn-ingresar');
+  btn.disabled = true; btn.textContent = 'Cargando...';
+
+  fetch(API_URL)
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      DATA = json;
+      btn.disabled = false; btn.textContent = 'Ingresar';
+    })
+    .catch(function(){
+      btn.disabled = false; btn.textContent = 'Ingresar';
+      document.getElementById('error-login').textContent =
+        'No se pudo conectar al portal. Probá de nuevo en un momento.';
+    });
+}
+cargarDatos();
+
+/* --- LOGIN --- */
+function iniciarSesion() {
+  var u = document.getElementById('inp-usuario').value.trim();
+  var p = document.getElementById('inp-pass').value.trim();
+  var err = document.getElementById('error-login');
+  var btn = document.getElementById('btn-ingresar');
+  err.textContent = 'Usuario o contraseña incorrectos.';
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  setTimeout(function(){
+    var match = DATA.usuarios.find(function(x){
+      return String(x.usuario).trim() === u
+        && String(x.pass).trim() === p
+        && String(x.activo).trim().toUpperCase() === 'SI';
+    });
+    if (match) {
+      sesion = match;
+      err.style.display = 'none';
+      abrirPortal();
+    } else {
+      err.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Ingresar';
+  }, 400);
+}
+
+function abrirPortal() {
+  document.getElementById('pantalla-login').style.display = 'none';
+  document.getElementById('pantalla-portal').style.display = 'block';
+  var navAcc = document.getElementById('nav-acciones');
+  navAcc.style.display = 'flex';
+  navAcc.style.alignItems = 'center';
+  document.getElementById('nav-empresa').textContent = sesion.empresa;
+  document.getElementById('portal-titulo').textContent = 'Hola, ' + sesion.empresa;
+
+  var switcher = document.getElementById('prop-switcher');
+  if (sesion.propiedad === 'ambos') {
+    switcher.style.display = 'flex';
+    propActual = 'restaurant';
+  } else {
+    switcher.style.display = 'none';
+    propActual = sesion.propiedad;
+  }
+  renderEventos();
+  renderComisiones();
+  actualizarContenido();
+}
+
+function cerrarSesion() {
+  sesion = null;
+  document.getElementById('pantalla-portal').style.display = 'none';
+  document.getElementById('pantalla-login').style.display = 'flex';
+  document.getElementById('nav-acciones').style.display = 'none';
+  document.getElementById('inp-usuario').value = '';
+  document.getElementById('inp-pass').value = '';
+  cambiarTab('eventos', document.querySelector('.tab-btn'));
+}
+
+/* --- RENDER EVENTOS (agrupa filas con mismo titulo+propiedad) --- */
+function renderEventos() {
+  ['restaurant','hotel'].forEach(function(prop){
+    var filas = DATA.eventos.filter(function(e){ return String(e.propiedad).trim() === prop; });
+    var grupos = {};
+    var orden = [];
+    filas.forEach(function(f){
+      var key = f.titulo;
+      if (!grupos[key]) { grupos[key] = []; orden.push(key); }
+      grupos[key].push(f);
+    });
+
+    var html = '';
+    orden.forEach(function(key){
+      var filasGrupo = grupos[key];
+      var principal = filasGrupo[0];
+      html += '<div class="event-card">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;">';
+      html += '<div><div class="serif" style="font-size:21px;color:#061b0e;">'+ (principal.titulo||'') +'</div>';
+      if (principal.subtitulo) html += '<div style="font-size:13px;color:#737973;margin-top:4px;">'+ principal.subtitulo +'</div>';
+      html += '</div>';
+      if (principal.comision) html += '<span class="badge-comision">Comisión '+ principal.comision +'</span>';
+      html += '</div>';
+      if (principal.descripcion) html += '<p style="font-size:14px;color:#434843;line-height:1.75;margin-bottom:18px;">'+ principal.descripcion +'</p>';
+
+      html += '<div style="background:#f4f4f0;padding:16px;">';
+      filasGrupo.forEach(function(f){
+        if (!f.precio_label) return;
+        html += '<div class="price-row"><span style="font-size:13px;color:#737973;">'+ f.precio_label +'</span>';
+        html += '<span style="font-size:15px;font-weight:500;color:#061b0e;">'+ (f.precio_valor||'') +'</span></div>';
+      });
+      if (principal.minimo) {
+        html += '<div class="price-row"><span style="font-size:13px;color:#737973;">Mínimo</span>';
+        html += '<span style="font-size:15px;font-weight:500;color:#061b0e;">'+ principal.minimo +'</span></div>';
+      }
+      html += '</div></div>';
+    });
+
+    document.getElementById('eventos-'+prop+'-lista').innerHTML = html || '<p style="font-size:13px;color:#737973;">Sin propuestas cargadas todavía.</p>';
+  });
+}
+
+/* --- RENDER COMISIONES --- */
+function renderComisiones() {
+  ['restaurant','hotel'].forEach(function(prop){
+    var filas = DATA.comisiones.filter(function(c){ return String(c.propiedad).trim() === prop; });
+    var html = '';
+    filas.forEach(function(c){
+      html += '<div class="price-row"><div>';
+      html += '<div style="font-size:14px;font-weight:500;color:#1b1c1a;">'+ (c.concepto||'') +'</div>';
+      if (c.detalle) html += '<div style="font-size:12px;color:#737973;margin-top:2px;">'+ c.detalle +'</div>';
+      html += '</div><div class="serif" style="font-size:26px;color:#061b0e;">'+ (c.porcentaje||'') +'</div></div>';
+    });
+    document.getElementById('comisiones-'+prop+'-lista').innerHTML = html || '<p style="font-size:13px;color:#737973;">Sin datos cargados todavía.</p>';
+  });
+}
+
+/* --- PROPIEDAD --- */
+function cambiarPropiedad(prop, el) {
+  propActual = prop;
+  document.querySelectorAll('.prop-tab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  actualizarContenido();
+}
+
+function actualizarContenido() {
+  var eResto = propActual === 'restaurant';
+  document.getElementById('eventos-restaurant').style.display   = eResto ? 'block' : 'none';
+  document.getElementById('eventos-hotel').style.display        = eResto ? 'none'  : 'block';
+  document.getElementById('comisiones-restaurant').style.display= eResto ? 'block' : 'none';
+  document.getElementById('comisiones-hotel').style.display     = eResto ? 'none'  : 'block';
+}
+
+/* --- TABS --- */
+function cambiarTab(tab, el) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  ['eventos','comisiones','contacto'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = (t===tab) ? 'block' : 'none';
+  });
+}
+
+/* Enter en password */
+document.getElementById('inp-pass').addEventListener('keydown', function(e){
+  if (e.key==='Enter') iniciarSesion();
+});
+
+/* --- SOLICITUD --- */
+function mostrarSolicitud() {
+  document.getElementById('pantalla-login').style.display = 'none';
+  var s = document.getElementById('pantalla-solicitud');
+  s.style.display = 'flex';
+  s.style.flexDirection = 'column';
+  s.style.alignItems = 'center';
+  s.style.justifyContent = 'center';
+}
+
+function volverLogin() {
+  document.getElementById('pantalla-solicitud').style.display = 'none';
+  document.getElementById('pantalla-login').style.display = 'flex';
+  document.getElementById('error-solicitud').style.display = 'none';
+  document.getElementById('exito-solicitud').style.display = 'none';
+  document.getElementById('btn-solicitar').disabled = false;
+  document.getElementById('btn-solicitar').textContent = 'Enviar solicitud';
+}
+
+function enviarSolicitud() {
+  var empresa  = document.getElementById('sol-empresa').value.trim();
+  var telefono = document.getElementById('sol-telefono').value.trim();
+  var email    = document.getElementById('sol-email').value.trim();
+  var tipo     = document.getElementById('sol-tipo').value;
+  var err      = document.getElementById('error-solicitud');
+  var exito    = document.getElementById('exito-solicitud');
+  var btn      = document.getElementById('btn-solicitar');
+
+  if (!empresa || !telefono || !email || !tipo) {
+    err.textContent = 'Completá todos los campos.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  exito.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ empresa: empresa, telefono: telefono, email: email, tipo: tipo })
+  })
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      btn.disabled = false;
+      if (data.ok) {
+        exito.style.display = 'block';
+        btn.textContent = 'Solicitud enviada';
+        document.getElementById('sol-empresa').value = '';
+        document.getElementById('sol-telefono').value = '';
+        document.getElementById('sol-email').value = '';
+        document.getElementById('sol-tipo').value = '';
+      } else {
+        err.textContent = 'No se pudo enviar. Probá de nuevo.';
+        err.style.display = 'block';
+        btn.textContent = 'Enviar solicitud';
+      }
+    })
+    .catch(function(){
+      btn.disabled = false;
+      btn.textContent = 'Enviar solicitud';
+      err.textContent = 'No se pudo conectar. Probá de nuevo en un momento.';
+      err.style.display = 'block';
+    });
+}
+</script>
+</body>
+</html>

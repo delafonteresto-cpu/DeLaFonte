@@ -95,6 +95,20 @@
 <meta property="og:image" content="https://www.delafonteresto.com/assets/og-cava.jpg">
 <meta property="og:url" content="https://www.delafonteresto.com/04-cava-de-vinos.html">
 <meta name="description" content="Más de 2500 etiquetas de vinos argentinos y del mundo. Club de vinos, catas y sommelier en De la Fonte, Puerto Iguazú.">
+<style id="df-mobile-nav-css">
+#df-mobile-btn{display:none;flex-direction:column;justify-content:center;align-items:center;width:40px;height:40px;gap:5px;background:none;border:none;cursor:pointer;padding:0;z-index:9200;}
+#df-mobile-btn span{display:block;width:24px;height:1.5px;background:#434843;transition:all 0.3s ease;}
+#df-mobile-menu{display:none;position:fixed;top:0;left:0;width:100%;background:rgba(250,249,245,0.98);backdrop-filter:blur(20px);z-index:9100;padding-top:136px;border-bottom:1px solid rgba(195,200,193,0.2);box-shadow:0 8px 24px rgba(6,27,14,0.06);}
+#df-mobile-menu a{display:block;padding:14px 2rem;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.15em;color:#434843;border-bottom:0.5px solid rgba(195,200,193,0.3);text-decoration:none;}
+#df-mobile-menu a:hover{color:#061b0e;}
+#df-mobile-menu .df-mob-reserve{background:#061b0e;color:#fff!important;text-align:center;border-bottom:none;margin-top:0;}
+#df-mobile-menu .df-mob-reserve:hover{background:#1b3022;}
+.df-ham-open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.df-ham-open span:nth-child(2){opacity:0;}
+.df-ham-open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+@media(min-width:768px){#df-mobile-btn{display:none!important;}#df-mobile-menu{display:none!important;}}
+@media(max-width:767px){#df-mobile-btn{display:flex!important;}.df-nav-links{display:none!important;}}
+</style>
 </head>
 <body class="font-body-md text-on-surface selection:bg-primary-container selection:text-white">
 <!-- TopNavBar -->
@@ -110,9 +124,22 @@
 <a href="05-blog.html" style="font-family:DM Sans,sans-serif;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;color:#434843;" onmouseover="this.style.color='#061b0e'" onmouseout="this.style.color='#434843'">Historias</a>
 
     </div>
-    <button onclick="abrirReserva()" style="background:#061b0e;color:#fff;padding:10px 24px;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#1b3022'" onmouseout="this.style.background='#061b0e'">Reservar</button>
+    <button id="df-mobile-btn" aria-label="Abrir menú" aria-expanded="false" style="display:none;flex-direction:column;justify-content:center;align-items:center;width:40px;height:40px;gap:5px;background:none;border:none;cursor:pointer;padding:0;">
+<span style="display:block;width:24px;height:1.5px;background:#434843;transition:all 0.3s ease;"></span>
+<span style="display:block;width:24px;height:1.5px;background:#434843;transition:all 0.3s ease;"></span>
+<span style="display:block;width:24px;height:1.5px;background:#434843;transition:all 0.3s ease;"></span>
+</button>
+<button onclick="abrirReserva()" style="background:#061b0e;color:#fff;padding:10px 24px;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#1b3022'" onmouseout="this.style.background='#061b0e'">Reservar</button>
   </div>
 </nav>
+<div id="df-mobile-menu" role="navigation" aria-label="Menú móvil">
+<a href="index.html">Inicio</a>
+<a href="03-experiencias.html">Experiencias</a>
+<a href="02-la-carta.html">Gastronomía</a>
+<a href="04-cava-de-vinos.html" style="color:#061b0e;font-weight:600;">La Cava</a>
+<a href="05-blog.html">Historias</a>
+<a href="reservas-form.html" class="df-mob-reserve">Reservar Mesa</a>
+</div>
 <div style="height:100px;"></div>
 <main>
 <!-- Hero Section -->
@@ -374,6 +401,31 @@ document.getElementById('reserva-overlay').addEventListener('click',function(e){
     var open=menu.style.display==='flex';
     menu.style.display=open?'none':'flex';
     menu.style.flexDirection='column';
+    btn.classList.toggle('df-ham-open',!open);
+    btn.setAttribute('aria-expanded',String(!open));
+  });
+  menu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click',function(){
+      menu.style.display='none';
+      btn.classList.remove('df-ham-open');
+    });
+  });
+  document.addEventListener('click',function(e){
+    if(!btn.contains(e.target)&&!menu.contains(e.target)){
+      menu.style.display='none';
+      btn.classList.remove('df-ham-open');
+    }
+  });
+})();
+</script>
+<script id="df-mobile-nav-js">
+(function(){
+  var btn=document.getElementById('df-mobile-btn');
+  var menu=document.getElementById('df-mobile-menu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(){
+    var open=menu.style.display==='block';
+    menu.style.display=open?'none':'block';
     btn.classList.toggle('df-ham-open',!open);
     btn.setAttribute('aria-expanded',String(!open));
   });

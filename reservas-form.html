@@ -494,6 +494,29 @@
       <button class="btn-nueva" onclick="resetForm()">Elegir otra fecha</button>
     </div>
 
+    <!-- Panel: Evento privado -->
+    <div class="result-panel no-availability" id="privateEventPanel">
+      <div class="result-icon" style="color:var(--gold)">◇</div>
+      <h2>Evento privado</h2>
+      <p>
+        El <span id="privateEventDateEs"></span> tenemos un evento privado.<br>
+        Elegí otra fecha para tu reserva,<br>
+        o consultanos por WhatsApp.
+      </p>
+      <p style="margin-top:12px;font-size:0.9em;opacity:0.85">
+        <em>We are hosting a private event on <span id="privateEventDateEn"></span>.<br>
+        Please choose another date,<br>
+        or contact us via WhatsApp.</em>
+      </p>
+      <a class="btn-whatsapp-alt" id="privateEventWhatsapp" href="#" target="_blank">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Consultar por WhatsApp
+      </a>
+      <button class="btn-nueva" onclick="resetForm()">Elegir otra fecha</button>
+    </div>
+
   </div>
 </div>
 
@@ -502,6 +525,11 @@
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ08Z66XZIbwk2JzvDxcFbmMObXg4uyzKJe7584cSx5r8rxod7qN-oExKOA_lt7Sb2Ag/exec'; // ← reemplazar
   const CAPACIDAD_MAX = 30;
   const WA_NUMBER = '5493757512802';
+
+  // Fechas con evento privado (no se aceptan reservas). Formato: 'AAAA-MM-DD'
+  const EVENTOS_PRIVADOS = {
+    '2026-11-21': { es: '21 de noviembre', en: 'November 21' }
+  };
 
   // ─── DISPONIBILIDAD EN TIEMPO REAL ───────────────────────────────
   let disponibilidadCache = {}; // { 'YYYY-MM-DD': personasOcupadas }
@@ -513,6 +541,7 @@
     const fecha = document.getElementById('fecha').value;
     const personas = parseInt(document.getElementById('personas').value);
     if (!fecha || !personas) return;
+    if (esEventoPrivado(fecha)) return;
 
     const bar = document.getElementById('availabilityBar');
     bar.classList.add('visible');
@@ -559,10 +588,19 @@
     return fechaObj.getDay() === 0; // 0 = domingo
   }
 
+  // ─── EVENTO PRIVADO ──────────────────────────────────────────────
+  function esEventoPrivado(fechaStr) {
+    return !!fechaStr && Object.prototype.hasOwnProperty.call(EVENTOS_PRIVADOS, fechaStr);
+  }
+
   document.getElementById('fecha').addEventListener('change', function() {
     const errFecha = document.getElementById('err-fecha');
     if (esDomingo(this.value)) {
       errFecha.textContent = 'De la Fonte permanece cerrado los domingos · Closed on Sundays';
+      errFecha.classList.add('visible');
+      document.getElementById('availabilityBar').classList.remove('visible');
+    } else if (esEventoPrivado(this.value)) {
+      errFecha.textContent = 'Evento privado en esa fecha · Private event on that date';
       errFecha.classList.add('visible');
       document.getElementById('availabilityBar').classList.remove('visible');
     } else {
@@ -604,6 +642,18 @@
     if (esDomingo(fechaSeleccionada)) {
       document.getElementById('formSection').style.display = 'none';
       document.getElementById('closedSundayPanel').classList.add('visible');
+      return;
+    }
+
+    if (esEventoPrivado(fechaSeleccionada)) {
+      const ev = EVENTOS_PRIVADOS[fechaSeleccionada];
+      document.getElementById('privateEventDateEs').textContent = ev.es;
+      document.getElementById('privateEventDateEn').textContent = ev.en;
+      document.getElementById('privateEventWhatsapp').href =
+        `https://wa.me/${WA_NUMBER}?text=` +
+        encodeURIComponent(`Hola! Quería consultar sobre una reserva para el ${ev.es}.`);
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('privateEventPanel').classList.add('visible');
       return;
     }
 
@@ -676,6 +726,7 @@
     document.getElementById('successPanel').classList.remove('visible');
     document.getElementById('noAvailPanel').classList.remove('visible');
     document.getElementById('closedSundayPanel').classList.remove('visible');
+    document.getElementById('privateEventPanel').classList.remove('visible');
     document.getElementById('btnSubmit').disabled = false;
     document.getElementById('btnText').style.display = 'block';
     document.getElementById('spinner').style.display = 'none';

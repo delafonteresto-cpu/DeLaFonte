@@ -531,6 +531,14 @@
     '2026-11-21': { es: '21 de noviembre', en: 'November 21' }
   };
 
+  // Fechas completas, sin más lugar. Formato: 'AAAA-MM-DD'
+  // Para sumar otra: ['2026-11-20', '2026-11-27']
+  const FECHAS_COMPLETAS = ['2026-11-20'];
+
+  function esCompleta(fechaStr) {
+    return !!fechaStr && FECHAS_COMPLETAS.indexOf(fechaStr) !== -1;
+  }
+
   // ─── DISPONIBILIDAD EN TIEMPO REAL ───────────────────────────────
   let disponibilidadCache = {}; // { 'YYYY-MM-DD': personasOcupadas }
 
@@ -541,7 +549,7 @@
     const fecha = document.getElementById('fecha').value;
     const personas = parseInt(document.getElementById('personas').value);
     if (!fecha || !personas) return;
-    if (esEventoPrivado(fecha)) return;
+    if (esEventoPrivado(fecha) || esCompleta(fecha)) return;
 
     const bar = document.getElementById('availabilityBar');
     bar.classList.add('visible');
@@ -599,6 +607,10 @@
       errFecha.textContent = 'De la Fonte permanece cerrado los domingos · Closed on Sundays';
       errFecha.classList.add('visible');
       document.getElementById('availabilityBar').classList.remove('visible');
+    } else if (esCompleta(this.value)) {
+      errFecha.textContent = 'Sin lugares disponibles para esa fecha · Fully booked on that date';
+      errFecha.classList.add('visible');
+      document.getElementById('availabilityBar').classList.remove('visible');
     } else if (esEventoPrivado(this.value)) {
       errFecha.textContent = 'Evento privado en esa fecha · Private event on that date';
       errFecha.classList.add('visible');
@@ -642,6 +654,12 @@
     if (esDomingo(fechaSeleccionada)) {
       document.getElementById('formSection').style.display = 'none';
       document.getElementById('closedSundayPanel').classList.add('visible');
+      return;
+    }
+
+    if (esCompleta(fechaSeleccionada)) {
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('noAvailPanel').classList.add('visible');
       return;
     }
 
